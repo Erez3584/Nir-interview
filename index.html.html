@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כלי תחקור — ניר · סבב 2</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --navy:#1A3A6B; --blue:#2E5BA8; --teal:#0F6E56; --amber:#C8A84B;
+    --coral:#993C1D; --bg:#F4F6FA; --card:#FFFFFF; --text:#1A1A2E;
+    --med:#555577; --border:#DDE3EE; --green:#2E7D32; --lgreen:#E8F5E9;
+    --red:#C0392B;
+  }
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height:1.6;
+    padding: 20px; max-width: 860px; margin: 0 auto;
+    padding-top: 76px;
+  }
+
+  /* אינדיקטור הקלטה צף בראש */
+  .floating-indicator {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    background: var(--navy); color:#fff; padding:12px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .floating-indicator .rec-info { display:flex; align-items:center; gap:12px; }
+  .rec-dot {
+    width:11px; height:11px; border-radius:50%; background: var(--red);
+    animation: pulse 1.4s infinite;
+  }
+  .rec-dot.paused { background: var(--amber); animation:none; }
+  .rec-time {
+    font-family: "Courier New", monospace; font-size:15px; font-weight:600;
+    color:#DDE7F5;
+  }
+  .floating-indicator .pause-btn {
+    background: rgba(255,255,255,0.15); color:#fff;
+    border:1px solid rgba(255,255,255,0.3);
+    padding: 7px 16px; font-size:13px; cursor:pointer; border-radius:6px;
+    transition: background .2s;
+  }
+  .floating-indicator .pause-btn:hover { background: rgba(255,255,255,0.28); }
+  .floating-indicator.paused { background: var(--coral); }
+
+  /* header */
+  header {
+    background: var(--navy); color:#fff; padding: 24px 28px;
+    border-radius: 14px; margin-bottom: 20px;
+  }
+  header h1 { font-size: 24px; font-weight:600; margin-bottom:6px; }
+  header p { font-size: 14px; color:#BBCCEE; }
+  .progress-bar {
+    height: 6px; background: rgba(255,255,255,0.2); border-radius:3px;
+    margin-top:16px; overflow:hidden;
+  }
+  .progress-fill { height:100%; background: var(--amber); width:0%; transition: width .4s; }
+
+  /* stage labels */
+  .stage-label {
+    display:inline-block; font-size:12px; font-weight:600; padding:4px 12px;
+    border-radius:6px; margin-bottom:12px;
+  }
+  .stage-welcome { background:#EEE; color:#555; }
+  .stage-block1 { background:#EBF0FA; color:var(--blue); }
+  .stage-block2 { background:#E1F5EE; color:var(--teal); }
+  .stage-block3 { background:#FBF3E0; color:#8A6D1B; }
+  .stage-block4 { background:#FDECE4; color:var(--coral); }
+  .stage-close { background:#EEE; color:#555; }
+
+  /* cards */
+  .card {
+    background: var(--card); border:0.5px solid var(--border);
+    border-radius: 14px; padding: 28px; margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .q-number { font-size:13px; color:var(--med); margin-bottom:8px; }
+  .q-text { font-size:20px; font-weight:500; margin-bottom:14px; line-height:1.55; }
+  .q-note {
+    font-size:13px; color:var(--med); font-style:italic;
+    background:#F7F7F5; padding:10px 14px; border-radius:8px; margin-bottom:18px;
+    border-right:3px solid var(--amber);
+  }
+
+  /* buttons */
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button {
+    font-family: inherit; font-size:15px; font-weight:500; cursor:pointer;
+    border:none; border-radius:10px; padding:12px 22px; transition: all .2s;
+  }
+  .btn-record { background: var(--coral); color:#fff; }
+  .btn-record.recording { background:#C0392B; animation: pulse 1.4s infinite; }
+  .btn-record:disabled { background:#BBB; cursor:not-allowed; animation:none; }
+  .btn-nav { background: var(--blue); color:#fff; }
+  .btn-nav:disabled { background:#BBB; cursor:not-allowed; }
+  .btn-ghost { background:transparent; color:var(--med); border:1px solid var(--border); }
+  .btn-primary { background: var(--navy); color:#fff; font-size:17px; padding:14px 32px; }
+  .btn-primary:hover { background: var(--blue); }
+  .btn-primary:disabled { background:#999; cursor:not-allowed; }
+  .btn-success { background: var(--green); color:#fff; }
+  .btn-success:hover { background: #246B27; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.65;} }
+
+  /* rec status — שני מצבים: רקע ידידותי ותמלול פעיל */
+  .rec-status { font-size: 13px; }
+  .rec-status.background { color: var(--med); font-style: italic; }
+  .rec-status.transcribing { color: var(--coral); font-weight: 500; font-size: 14px; }
+
+  /* transcript */
+  .transcript {
+    margin-top:18px; padding:16px; background:#FAFBFC;
+    border:1px solid var(--border); border-radius:10px; min-height:90px;
+    font-size:16px; line-height:1.7;
+  }
+  .transcript:empty::before {
+    content:"כאן יופיע התמלול בזמן אמת... ניתן גם להקליד ידנית."; color:#AAB; font-style:italic;
+  }
+  .transcript[contenteditable="true"] { outline:none; }
+  .transcript.editable { border-color: var(--blue); background:#fff; }
+  .edit-hint { font-size:12px; color:var(--med); margin-top:6px; }
+
+  /* navigation */
+  .nav-row {
+    display:flex; justify-content:space-between; gap:12px; margin-top:18px;
+  }
+  .saved-pill {
+    display:inline-block; font-size:12px; color:var(--green);
+    background:var(--lgreen); padding:3px 10px; border-radius:6px; margin-right:8px;
+  }
+
+  /* warnings */
+  .warn {
+    background:#FEF6E7; border:1px solid #F0D9A0; color:#8A6D1B;
+    padding:12px 16px; border-radius:10px; font-size:13px; margin-bottom:16px;
+  }
+
+  /* welcome screen */
+  .welcome-screen { padding: 32px 30px; }
+  .welcome-screen h2 { color:var(--navy); font-size:26px; margin-bottom:18px; }
+  .welcome-screen p { font-size:16px; margin-bottom:14px; }
+  .welcome-screen ul { margin: 18px 0; padding-right: 24px; }
+  .welcome-screen ul li { margin-bottom: 10px; font-size: 16px; }
+  .welcome-screen .btn-primary { margin-top: 14px; }
+  .welcome-screen .center { text-align:center; }
+
+  /* mic test */
+  .mic-test { text-align: center; padding: 30px; }
+  .mic-test h2 { color:var(--navy); margin-bottom:16px; font-size:24px; }
+  .mic-test p { margin-bottom: 18px; color: var(--med); }
+  .mic-visualizer {
+    width: 100%; max-width: 520px; height: 130px; margin: 26px auto;
+    background: #F0F4F8; border-radius: 12px; overflow:hidden;
+  }
+  .mic-visualizer canvas { width:100%; height:100%; display:block; }
+  .mic-status {
+    font-size: 15px; margin: 16px 0; color: var(--med);
+    transition: color .3s;
+  }
+  .mic-status.detected { color: var(--green); font-weight: 600; }
+  .mic-buttons {
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+    margin-top: 24px;
+  }
+
+  /* done screen */
+  .done-screen { padding: 32px 28px; }
+  .done-screen h2 { color:var(--navy); margin-bottom:14px; font-size:26px; text-align:center; }
+  .done-screen .summary { text-align:center; margin-bottom: 22px; }
+  .download-area {
+    background: var(--lgreen); border: 1px solid #B5D9B7;
+    padding: 22px; border-radius: 12px; margin: 22px 0;
+  }
+  .download-area h3 { color: var(--navy); margin-bottom: 14px; font-size: 17px; }
+  .file-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.08); gap:14px;
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-info { flex:1; min-width:0; }
+  .file-name { font-weight: 600; font-size:15px; color:var(--text); word-break:break-all; }
+  .file-size { font-size: 13px; color: var(--med); margin-top:2px; }
+  .download-hint {
+    font-size:13px; color:var(--med); margin-top:12px;
+    padding-top:12px; border-top:1px solid rgba(0,0,0,0.08);
+  }
+  .send-instructions {
+    background: #F7F9FC; border: 1px solid var(--border);
+    padding: 22px; border-radius: 12px; margin: 22px 0;
+  }
+  .send-instructions h3 { color: var(--navy); margin-bottom: 16px; font-size: 18px; }
+  .send-option {
+    margin-bottom: 16px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .send-option:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .send-option .opt-title {
+    font-weight:600; color: var(--blue); margin-bottom: 6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .send-option .opt-body { font-size: 15px; color: var(--text); }
+  .email-warn {
+    background:#FEF6E7; border:1px solid #F0D9A0; color:#8A6D1B;
+    padding:12px 16px; border-radius:10px; font-size:14px; margin-top:16px;
+  }
+  .cleanup-row {
+    text-align:center; margin-top: 22px; padding-top:18px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-cleanup {
+    background: transparent; color: var(--med); border:1px solid var(--border);
+    font-size:13px; padding: 8px 16px;
+  }
+  .btn-cleanup:hover { background: #F0F2F6; }
+  .btn-cleanup.done { color: var(--green); border-color: var(--green); }
+  .thanks {
+    text-align:center; color:var(--med); margin-top:24px; font-size:15px;
+  }
+</style>
+</head>
+<body>
+
+<div id="floatingIndicator" class="floating-indicator" style="display:none;">
+  <div class="rec-info">
+    <div class="rec-dot" id="recDot"></div>
+    <span id="recStateText">ראיון מוקלט</span>
+    <span class="rec-time" id="recTime">0:00:00</span>
+  </div>
+  <button class="pause-btn" id="pauseBtn">⏸ השהה ראיון</button>
+</div>
+
+<div id="browserWarn" class="warn" style="display:none;">
+  ⚠️ התמלול הקולי החי עובד הכי טוב ב-Chrome או Edge. אם אתה בדפדפן אחר, אפשר להקליד ידנית — ההקלטה הקולית תישמר באודיו בכל מקרה.
+</div>
+
+<div id="app"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  STAGES: welcome → mic_test → interview → done
+// ════════════════════════════════════════════════════════════════════
+let stage = 'welcome';
+
+// ════════════════════════════════════════════════════════════════════
+//  QUESTIONS — פרוטוקול סבב 2 של ניר (Rolling Pals)
+// ════════════════════════════════════════════════════════════════════
+const QUESTIONS = [
+  // === BLOCK 1: הזיכרון של הרעיון ===
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.0 · פתיחה",
+   text:"הפעם הקודמת הזכרת המון דברים מעניינים, אבל הרבה נשארו פתוחים. המוצר שהכי רציתי להבין לעומק הוא Rolling Pals — המשטח המתגלגל. מצד אחד הוא המצאה טכנית מדהימה, ומצד שני הוא לא הצליח מסחרית. זה מסקרן אותי, ואני רוצה להבין איתך איך המוצר הזה נולד.",
+   note:"זו פתיחה — לא חובה להקליט תשובה. לחץ 'הבא' כשמוכן."},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.1",
+   text:"קח אותי לרגע הראשון שבו הרעיון של Rolling Pals נולד אצלך. איפה היית? מה ראית? מה גרם לך לחשוב 'אפשר לעשות מזה מוצר'?",
+   note:"שאלת פתיחה רחבה. קח את הזמן שלך — אפשר להיכנס לפרטים."},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.1·א",
+   text:"מה בדיוק היה שונה במשטחים הקיימים בשוק, שאחרים לא זיהו כנקודת המוצא?",
+   note:"מה אתה ראית והם לא."},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.1·ב",
+   text:"מה היה המשפט הראשון שאמרת לעצמך — הרגע שבו הרגשת 'אני יכול לפתור את זה'?",
+   note:""},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.1·ג",
+   text:"היית מישהו שתמיד חשב על משטח מתגלגל, או שהרעיון הגיע תוך כדי טיפול במשהו אחר?",
+   note:""},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.1·ד",
+   text:"איך ידעת שמה שראית זו הצעה אמיתית למוצר ולא עוד שיפור של משהו קיים?",
+   note:""},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.2",
+   text:"כשניגשת לראשונה למנהלים או לשותפים להציג להם את הרעיון — מה הייתה התגובה הראשונה? אמרו 'כן, זה גאוני' או 'זה לא יעבוד'?",
+   note:"רגע ספציפי — איך מוכרים רעיון בפעם הראשונה."},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.3",
+   text:"מה היה הדבר הכי קשה לשכנע בו את ההנהלה בשלב ההערכה הראשוני? מה היה הטיעון המרכזי נגדך?",
+   note:""},
+
+  {block:1, stage:"בלוק 1 · הזיכרון של הרעיון", cls:"stage-block1", num:"1.4",
+   text:"לפני שעוברים לשלב הבא — מה היה רגע ה'הצתה'? הרגע שבו הבנת שהרעיון באמת עובד?",
+   note:""},
+
+  // === BLOCK 2: שלב האפיון ===
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.1",
+   text:"מי היה הלקוח הראשון שהלכת לדבר איתו על המוצר הזה? מה הדבר הראשון שהוא שאל אותך?",
+   note:"רגע ספציפי — השיחה הראשונה עם לקוח חיצוני."},
+
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.2",
+   text:"איך הגעת להחלטה שהמנגנון יהיה דווקא זה? היו הרבה דרכים לפתור את הבעיה — למה דווקא 'משטח עם גלגלים מתקפלים'?",
+   note:"איך התקבלה ההחלטה — לא רק מה היא."},
+
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.2·א",
+   text:"אילו חלופות אחרות היו על השולחן? למה פסלת אותן?",
+   note:""},
+
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.2·ב",
+   text:"מה הדבר שהכריע את הכף לכיוון שבחרת?",
+   note:""},
+
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.3",
+   text:"מה היו ההחלטות הטכנולוגיות הגדולות שקיבלת בשלב הזה? תן לי דוגמה אחת להחלטה קריטית — מה היה התהליך להגיע אליה?",
+   note:"רוצים את התהליך, לא רק את התוצאה."},
+
+  {block:2, stage:"בלוק 2 · שלב האפיון", cls:"stage-block2", num:"2.4",
+   text:"בשלב הזה — מי היה מעורב מלבדך? אמרת שהלקוחות הראשונים הם המנהלים שלך — איך התהליך איתם? מה היה קשה? מה עזר?",
+   note:""},
+
+  // === BLOCK 3: שלב הפיתוח והבדיקה ===
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.1",
+   text:"תוכל לתאר לי בדיוק את סיפור קוקה-קולה? בוקר ראשון — מה ראית, מה גילית? קח אותי דרך התהליך צעד אחר צעד.",
+   note:"קח את הזמן — זה אחד הסיפורים החשובים. אל תפסח על הפרטים."},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.1·א",
+   text:"מה הייתה תקלה שלא ציפית לה?",
+   note:""},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.1·ב",
+   text:"מה גילית שהפתיע אותך?",
+   note:""},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.1·ג",
+   text:"איך תיקנת תקלה ספציפית תוך כדי? מה היה התיקון הטכני?",
+   note:""},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.1·ד",
+   text:"אילו תקלות לא הצלחת לפתור?",
+   note:""},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.2",
+   text:"מה הייתה התקלה הגדולה ביותר שנתקלת בה בתהליך? לקחה אותך בהפתעה או ראית אותה מתקרבת?",
+   note:""},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.3",
+   text:"במהלך הפיתוח — היו רגעים שבהם שקלת להרים ידיים ולהגיד 'זה לא יעבוד'? איך החלטת להמשיך?",
+   note:"קשור למשפט שלך — 'פיתוח מוצר נגמר ביום שהמוצר מת'."},
+
+  {block:3, stage:"בלוק 3 · שלב הפיתוח והבדיקה", cls:"stage-block3", num:"3.4",
+   text:"היה רגע שבו הרגשת 'עכשיו המוצר מוכן'? מתי ידעת שסיימת את שלב הפיתוח?",
+   note:""},
+
+  // === BLOCK 4: המסחור והכישלון ===
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.1",
+   text:"מתי התחלת להבין שהמוצר לא תופס בשוק כמו שציפיתם? מה היה הסימן הראשון?",
+   note:"זיהוי רגעי הכישלון — איפה התחלת לראות שזה לא הולך."},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.2",
+   text:"בדיעבד — אילו סימני אזהרה היית יכול לראות מוקדם יותר? היו רמזים לפני שהבנת שזה לא יושלם?",
+   note:"זה הזהב — סימני אזהרה מוקדמים. קח את הזמן."},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.2·א",
+   text:"אילו שיחות בתוך החברה או מול הלקוחות היו צריכות להדליק נורה אדומה?",
+   note:""},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.2·ב",
+   text:"מה לקוחות שבדקו את המוצר אמרו — גם אם הם בסוף קנו?",
+   note:""},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.2·ג",
+   text:"הייתה לך תחושה פנימית שמשהו לא מתקדם כמו שצריך? מתי?",
+   note:""},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.3",
+   text:"מה היית עושה אחרת אם היית מתחיל את Rolling Pals היום? אילו צעדים היית משנה בדרך?",
+   note:"התמונה המתוקנת שלך — מאוד חשוב."},
+
+  {block:4, stage:"בלוק 4 · המסחור והכישלון", cls:"stage-block4", num:"4.4",
+   text:"המשפט שלך 'פיתוח של מוצר נגמר ביום שהמוצר מת, לא ביום שהוא נמכר' — זה בא מהניסיון של Rolling Pals? או מדברים אחרים?",
+   note:"מחבר בין הסיפור הספציפי לעקרון הכללי שלך."},
+
+  // === סגירה ===
+  {block:5, stage:"סגירה", cls:"stage-close", num:"ס.1",
+   text:"אם היית צריך לרכז את כל המסע של Rolling Pals לאמירה אחת — מה היית אומר? מה הלקח הגדול מכל זה?",
+   note:""},
+
+  {block:5, stage:"סגירה", cls:"stage-close", num:"ס.2",
+   text:"איזה חלק מהמסע הזה אתה מרגיש שמהווה דפוס שחזר אצלך גם בפרויקטים אחרים?",
+   note:""},
+
+  {block:5, stage:"סגירה", cls:"stage-close", num:"ס.3",
+   text:"לפני שמסיימים — אם תוכל במשפט אחד לסכם מה למדת מסיפור Rolling Pals — מה היית אומר?",
+   note:"המשפט האחרון. קח את הזמן."},
+];
+
+// ════════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════════
+let current = 0;
+let answers = {};
+let timestamps = {};
+let recognition = null;
+let isLiveTranscribing = false;
+let mediaRecorder = null;
+let audioChunks = [];                    // in-memory chunks (session נוכחי)
+let pendingChunkWrites = [];             // IDB writes שעוד לא הסתיימו
+let recordingStartTime = null;
+let recordingPausedTime = 0;
+let lastPauseStart = null;
+let isInterviewPaused = false;
+let timerInterval = null;
+let micStream = null;
+let recoveredElapsedSeconds = 0;         // אם משחזרים — כמה זמן עבר עד הקריסה
+
+// מצב התמלול — מאפשר עריכה ידנית בלי שתימחק
+const transcriptState = {
+  committedText: '',  // טקסט סופי (כולל עריכות ידניות)
+  currentInterim: ''  // טקסט זמני שעוד יכול להשתנות
+};
+
+// ════════════════════════════════════════════════════════════════════
+//  LOCAL STORAGE — שמירה אוטומטית של תמלול ומצב
+// ════════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'nir_interview_data';
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      answers, timestamps, current,
+      elapsedSeconds: recordingStartTime ? getElapsedSeconds() : 0,
+      lastSaved: new Date().toISOString()
+    }));
+  } catch(e) { console.warn('storage save failed', e); }
+}
+function loadFromStorage() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch(e) { return null; }
+}
+function clearStorage() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  INDEXED DB — שמירת chunks של אודיו לעמידות בקריסה
+// ════════════════════════════════════════════════════════════════════
+const DB_NAME = 'nir_interview_db';
+const DB_VERSION = 1;
+const CHUNKS_STORE = 'audio_chunks';
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      if (!database.objectStoreNames.contains(CHUNKS_STORE)) {
+        database.createObjectStore(CHUNKS_STORE, { autoIncrement: true });
+      }
+    };
+  });
+}
+function saveChunk(blob) {
+  return new Promise((resolve, reject) => {
+    if (!db) return reject(new Error('DB not open'));
+    const tx = db.transaction(CHUNKS_STORE, 'readwrite');
+    const store = tx.objectStore(CHUNKS_STORE);
+    const req = store.add(blob);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function getAllChunks() {
+  return new Promise((resolve, reject) => {
+    if (!db) return resolve([]);
+    const tx = db.transaction(CHUNKS_STORE, 'readonly');
+    const store = tx.objectStore(CHUNKS_STORE);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+function clearChunks() {
+  return new Promise((resolve, reject) => {
+    if (!db) return resolve();
+    const tx = db.transaction(CHUNKS_STORE, 'readwrite');
+    const store = tx.objectStore(CHUNKS_STORE);
+    const req = store.clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+function hasChunks() {
+  return new Promise((resolve) => {
+    if (!db) return resolve(false);
+    const tx = db.transaction(CHUNKS_STORE, 'readonly');
+    const store = tx.objectStore(CHUNKS_STORE);
+    const req = store.count();
+    req.onsuccess = () => resolve(req.result > 0);
+    req.onerror = () => resolve(false);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  SPEECH RECOGNITION (Web Speech API — תמלול חי)
+// ════════════════════════════════════════════════════════════════════
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function initSpeechRecognition() {
+  if (!SR) {
+    const w = document.getElementById('browserWarn');
+    if (w) w.style.display = 'block';
+    return;
+  }
+  recognition = new SR();
+  recognition.lang = 'he-IL';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════════════════════════════════
+function formatTime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function getElapsedSeconds() {
+  if (!recordingStartTime) return 0;
+  const now = Date.now();
+  const currentPause = lastPauseStart ? (now - lastPauseStart) : 0;
+  return (now - recordingStartTime - recordingPausedTime - currentPause) / 1000;
+}
+function updateTimer() {
+  const el = document.getElementById('recTime');
+  if (el) el.textContent = formatTime(getElapsedSeconds());
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  AUDIO RECORDING (MediaRecorder + IndexedDB)
+// ════════════════════════════════════════════════════════════════════
+async function startAudioRecording(savedElapsed = 0) {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let options = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 64000 };
+
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      options = { mimeType: 'audio/webm' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = {};
+      }
+    }
+
+    mediaRecorder = new MediaRecorder(micStream, options);
+    audioChunks = [];
+    pendingChunkWrites = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        audioChunks.push(e.data);
+        // כתיבה ל-IndexedDB לעמידות בקריסה
+        const writePromise = saveChunk(e.data).catch(err => {
+          console.warn('chunk save to IDB failed', err);
+        });
+        pendingChunkWrites.push(writePromise);
+      }
+    };
+
+    mediaRecorder.start(1000); // chunk כל שנייה
+    // אם משחזרים — מתחילים מהזמן הקודם, לא מאפס
+    recordingStartTime = Date.now() - (savedElapsed * 1000);
+    recordingPausedTime = 0;
+    timerInterval = setInterval(updateTimer, 1000);
+    return true;
+  } catch(e) {
+    console.error(e);
+    alert('לא הצלחנו לגשת למיקרופון. ודא שאישרת גישה ושאין יישום אחר שמשתמש בו, ונסה שוב.');
+    return false;
+  }
+}
+
+function pauseInterview() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.pause();
+  }
+  if (recognition && isLiveTranscribing) {
+    try { recognition.stop(); } catch(e){}
+    isLiveTranscribing = false;
+  }
+  isInterviewPaused = true;
+  lastPauseStart = Date.now();
+
+  const ind = document.getElementById('floatingIndicator');
+  ind.classList.add('paused');
+  document.getElementById('recDot').classList.add('paused');
+  document.getElementById('recStateText').textContent = 'הראיון מושהה';
+  document.getElementById('pauseBtn').textContent = '▶ המשך ראיון';
+
+  const recBtn = document.getElementById('recBtn');
+  if (recBtn) {
+    recBtn.disabled = true;
+    recBtn.textContent = '🎤 הראיון מושהה';
+  }
+  const recStatus = document.getElementById('recStatus');
+  if (recStatus) {
+    recStatus.className = 'rec-status background';
+    recStatus.textContent = 'הראיון מושהה — לחץ "המשך ראיון" למעלה';
+  }
+}
+
+function resumeInterview() {
+  if (mediaRecorder && mediaRecorder.state === 'paused') {
+    mediaRecorder.resume();
+  }
+  if (lastPauseStart) {
+    recordingPausedTime += (Date.now() - lastPauseStart);
+    lastPauseStart = null;
+  }
+  isInterviewPaused = false;
+
+  const ind = document.getElementById('floatingIndicator');
+  ind.classList.remove('paused');
+  document.getElementById('recDot').classList.remove('paused');
+  document.getElementById('recStateText').textContent = 'ראיון מוקלט';
+  document.getElementById('pauseBtn').textContent = '⏸ השהה ראיון';
+
+  const recBtn = document.getElementById('recBtn');
+  if (recBtn) {
+    recBtn.disabled = false;
+    recBtn.textContent = '🎤 התחל תמלול חי';
+  }
+  const recStatus = document.getElementById('recStatus');
+  if (recStatus) {
+    recStatus.className = 'rec-status background';
+    recStatus.textContent = 'ההקלטה הקולית רצה ברקע';
+  }
+}
+
+async function stopAllRecording() {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') return null;
+
+  return new Promise((resolve) => {
+    mediaRecorder.onstop = async () => {
+      // המתנה לסיום כל הכתיבות ל-IDB (כולל ה-chunk האחרון)
+      try {
+        await Promise.all(pendingChunkWrites);
+      } catch(e) { console.warn('some chunks failed to save', e); }
+
+      // קריאת כל ה-chunks (כולל מסשנים קודמים אם היו)
+      try {
+        const allChunks = await getAllChunks();
+        if (allChunks.length > 0) {
+          const blob = new Blob(allChunks, { type: 'audio/webm' });
+          resolve(blob);
+          return;
+        }
+      } catch(e) { console.warn('failed to read chunks from IDB', e); }
+
+      // fallback ל-chunks בזיכרון (סשן נוכחי בלבד)
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      resolve(blob);
+    };
+
+    if (mediaRecorder.state === 'paused') {
+      mediaRecorder.resume(); // חייב לחדש כדי לעצור נקי
+    }
+    mediaRecorder.stop();
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+    if (timerInterval) clearInterval(timerInterval);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  STAGE: WELCOME
+// ════════════════════════════════════════════════════════════════════
+function renderWelcome() {
+  document.getElementById('app').innerHTML = `
+    <header>
+      <h1>תחקור — סבב 2</h1>
+      <p>מסע פיתוח Rolling Pals · ידע סמוי שלא קיים בשום מקום אחר</p>
+    </header>
+    <div class="card welcome-screen">
+      <span class="stage-label stage-welcome">ברוך הבא</span>
+      <h2>תודה על ההשתתפות, ניר</h2>
+      <p>זה הראיון השני שלנו, הפעם דרך הכלי הזה. רצינו לתת לך מרחב מסודר לדבר בקצב שלך, בלי לחץ של פגישה.</p>
+      <p><strong>איך זה עובד:</strong></p>
+      <ul>
+        <li>הראיון מחולק ל-<strong>4 בלוקים</strong> סביב המסע של Rolling Pals — מהרעיון הראשון, דרך האפיון והפיתוח, ועד המסחור</li>
+        <li>הקלטה קולית רצה ברקע, ובמקביל יש <strong>תמלול חי</strong> שתוכל לתקן ידנית אם משהו לא נקלט נכון</li>
+        <li>ניתן <strong>להשהות את הראיון</strong> בכל רגע — כפתור יופיע למעלה כשנתחיל</li>
+        <li>בסוף יורדים <strong>שני קבצים</strong> אליך למחשב, ותקבל הוראות פשוטות איך לשלוח לנו אותם</li>
+      </ul>
+      <p>חלק מהשאלות נכנסות לעומק סביב אותו נושא. תרגיש חופשי לדלג על שאלה אם אין לך מה להוסיף — לא חובה לענות על הכל.</p>
+      <div class="center">
+        <button class="btn-primary" id="goToMicTest">בדיקת מיקרופון →</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('goToMicTest').onclick = () => {
+    stage = 'mic_test';
+    renderMicTest();
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  STAGE: MIC TEST
+// ════════════════════════════════════════════════════════════════════
+let micTestAudioContext = null;
+let micTestAnalyser = null;
+let micTestStream = null;
+let micTestAnimationId = null;
+let micTestDetected = false;
+
+async function startMicTest() {
+  try {
+    micTestStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    micTestAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = micTestAudioContext.createMediaStreamSource(micTestStream);
+    micTestAnalyser = micTestAudioContext.createAnalyser();
+    micTestAnalyser.fftSize = 256;
+    source.connect(micTestAnalyser);
+
+    drawMicVisualizer();
+    document.getElementById('micStatus').textContent = '👂 מאזין... תגיד משהו כדי לבדוק';
+    return true;
+  } catch(e) {
+    document.getElementById('micStatus').textContent = '❌ לא הצלחנו לגשת למיקרופון. ודא שאישרת גישה בדפדפן.';
+    return false;
+  }
+}
+
+function drawMicVisualizer() {
+  const canvas = document.getElementById('micCanvas');
+  if (!canvas || !micTestAnalyser) return;
+  const ctx = canvas.getContext('2d');
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * dpr;
+  canvas.height = canvas.clientHeight * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const dataArray = new Uint8Array(micTestAnalyser.frequencyBinCount);
+
+  function draw() {
+    micTestAnimationId = requestAnimationFrame(draw);
+    micTestAnalyser.getByteFrequencyData(dataArray);
+
+    ctx.fillStyle = '#F0F4F8';
+    ctx.fillRect(0, 0, w, h);
+
+    const bars = 42;
+    const barWidth = w / bars;
+    let maxLevel = 0;
+
+    for (let i = 0; i < bars; i++) {
+      const idx = Math.floor(i * dataArray.length / bars);
+      const v = dataArray[idx] / 255;
+      maxLevel = Math.max(maxLevel, v);
+      const barHeight = Math.max(3, v * h * 0.85);
+
+      const x = i * barWidth;
+      const y = (h - barHeight) / 2;
+
+      ctx.fillStyle = v > 0.5 ? '#2E5BA8' : v > 0.2 ? '#0F6E56' : '#9AAACC';
+      ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
+    }
+
+    if (maxLevel > 0.15 && !micTestDetected) {
+      micTestDetected = true;
+      const status = document.getElementById('micStatus');
+      const btn = document.getElementById('proceedBtn');
+      if (status) {
+        status.textContent = '✓ המיקרופון עובד מצוין';
+        status.classList.add('detected');
+      }
+      if (btn) btn.disabled = false;
+    }
+  }
+  draw();
+}
+
+function stopMicTest() {
+  if (micTestAnimationId) cancelAnimationFrame(micTestAnimationId);
+  if (micTestStream) micTestStream.getTracks().forEach(t => t.stop());
+  if (micTestAudioContext) {
+    try { micTestAudioContext.close(); } catch(e){}
+  }
+  micTestStream = null;
+  micTestAudioContext = null;
+  micTestAnalyser = null;
+  micTestDetected = false;
+}
+
+function renderMicTest() {
+  const isRecovery = recoveredElapsedSeconds > 0;
+  const recoveryNote = isRecovery
+    ? `<div class="warn" style="margin-bottom:20px;">
+        ℹ️ ממשיכים מנקודה שעצרת — הקלטה קודמת נשמרה ותצורף לסיום. השעון יתחיל מ-${formatTime(recoveredElapsedSeconds)}.
+       </div>`
+    : '';
+
+  document.getElementById('app').innerHTML = `
+    <header>
+      <h1>תחקור — סבב 2</h1>
+      <p>בדיקת מיקרופון לפני שמתחילים</p>
+    </header>
+    ${recoveryNote}
+    <div class="card mic-test">
+      <span class="stage-label stage-welcome">צעד אחרון לפני שמתחילים</span>
+      <h2>בדיקת מיקרופון</h2>
+      <p>תגיד משהו קצר — אם המיקרופון עובד, תראה את הגלים זזים.</p>
+      <div class="mic-visualizer">
+        <canvas id="micCanvas"></canvas>
+      </div>
+      <div class="mic-status" id="micStatus">⏳ מבקש הרשאת מיקרופון...</div>
+      <div class="mic-buttons">
+        <button class="btn-ghost" id="backToWelcome">← חזרה</button>
+        <button class="btn-primary" id="proceedBtn" disabled>בוא נתחיל! →</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('backToWelcome').onclick = () => {
+    stopMicTest();
+    stage = 'welcome';
+    renderWelcome();
+  };
+
+  document.getElementById('proceedBtn').onclick = async () => {
+    stopMicTest();
+    stage = 'interview';
+    const ok = await startAudioRecording(recoveredElapsedSeconds);
+    if (!ok) {
+      stage = 'welcome';
+      renderWelcome();
+      return;
+    }
+    document.getElementById('floatingIndicator').style.display = 'flex';
+    initSpeechRecognition();
+    setupFloatingControls();
+    renderInterview();
+  };
+
+  startMicTest();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  FLOATING CONTROLS
+// ════════════════════════════════════════════════════════════════════
+function setupFloatingControls() {
+  document.getElementById('pauseBtn').onclick = () => {
+    if (isInterviewPaused) resumeInterview();
+    else pauseInterview();
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  STAGE: INTERVIEW
+// ════════════════════════════════════════════════════════════════════
+function renderInterview() {
+  const total = QUESTIONS.length;
+
+  if (current >= total) {
+    finishInterview();
+    return;
+  }
+
+  const q = QUESTIONS[current];
+  const saved = answers[current];
+
+  document.getElementById('app').innerHTML = `
+    <header>
+      <h1>תחקור — סבב 2</h1>
+      <p>מסע פיתוח Rolling Pals</p>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(current/(total-1))*100}%"></div></div>
+    </header>
+    <div class="card">
+      <span class="stage-label ${q.cls}">${q.stage}</span>
+      <div class="q-number">${q.num} · שאלה ${current+1} מתוך ${total}</div>
+      <div class="q-text">${q.text}</div>
+      ${q.note ? `<div class="q-note">💡 ${q.note}</div>` : ''}
+      <div class="controls">
+        <button class="btn-record" id="recBtn">🎤 התחל תמלול חי</button>
+        <span class="rec-status background" id="recStatus">ההקלטה הקולית רצה ברקע</span>
+      </div>
+      <div class="transcript editable" id="transcript" contenteditable="true">${saved||''}</div>
+      <div class="edit-hint">ניתן לערוך את התמלול ידנית בכל רגע — העריכה תישמר גם בזמן שהתמלול החי פעיל.</div>
+      <div class="nav-row">
+        <button class="btn-ghost" id="prevBtn" ${current===0?'disabled':''}>← הקודם</button>
+        <div>
+          ${saved ? '<span class="saved-pill">✓ נשמר</span>':''}
+          <button class="btn-nav" id="nextBtn">${current===total-1?'סיום הראיון ←':'הבא →'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const recBtn = document.getElementById('recBtn');
+  const transcript = document.getElementById('transcript');
+  const recStatus = document.getElementById('recStatus');
+
+  if (!SR) {
+    recBtn.disabled = true;
+    recBtn.textContent = '🎤 תמלול חי לא נתמך — הקלד ידנית';
+  }
+  if (isInterviewPaused) {
+    recBtn.disabled = true;
+    recBtn.textContent = '🎤 הראיון מושהה';
+    recStatus.textContent = 'הראיון מושהה — לחץ "המשך ראיון" למעלה';
+  }
+
+  recBtn.onclick = () => {
+    if (!isLiveTranscribing) startLiveTranscription(transcript, recBtn, recStatus);
+    else stopLiveTranscription(recBtn, recStatus);
+  };
+
+  // עריכה ידנית — שומר את המצב כך שתמלול עתידי לא ימחק את העריכה
+  transcript.oninput = () => {
+    if (isLiveTranscribing) {
+      // המשתמש ערך תוך כדי תמלול — נסנכרן את state כך שכל הטקסט שבתיבה הופך ל-committed
+      transcriptState.committedText = transcript.innerText;
+      if (transcriptState.committedText && !transcriptState.committedText.endsWith(' ')) {
+        transcriptState.committedText += ' ';
+      }
+      transcriptState.currentInterim = '';
+    }
+    answers[current] = transcript.innerText.trim();
+    saveToStorage();
+  };
+
+  document.getElementById('nextBtn').onclick = () => {
+    answers[current] = transcript.innerText.trim();
+    if (timestamps[current] === undefined && recordingStartTime) {
+      timestamps[current] = Math.floor(getElapsedSeconds());
+    }
+    if (isLiveTranscribing) stopLiveTranscription(recBtn, recStatus);
+    saveToStorage();
+    current++;
+    renderInterview();
+  };
+
+  const prevBtn = document.getElementById('prevBtn');
+  if (prevBtn) prevBtn.onclick = () => {
+    answers[current] = transcript.innerText.trim();
+    if (isLiveTranscribing) stopLiveTranscription(recBtn, recStatus);
+    saveToStorage();
+    current--;
+    renderInterview();
+  };
+
+  // טסטמפ של התחלת השאלה
+  if (timestamps[current] === undefined && recordingStartTime) {
+    timestamps[current] = Math.floor(getElapsedSeconds());
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  LIVE TRANSCRIPTION
+// ════════════════════════════════════════════════════════════════════
+function startLiveTranscription(transcript, btn, status) {
+  if (!recognition || isInterviewPaused) return;
+  isLiveTranscribing = true;
+  btn.classList.add('recording');
+  btn.textContent = '⏹ הפסק תמלול חי';
+  status.className = 'rec-status transcribing';
+  status.textContent = '● מתמלל...';
+
+  // אתחול state עם מה שכבר בתיבה (כולל עריכות ידניות קודמות)
+  transcriptState.committedText = transcript.innerText.trim();
+  if (transcriptState.committedText) transcriptState.committedText += ' ';
+  transcriptState.currentInterim = '';
+
+  recognition.onresult = (e) => {
+    let interim = '', finalT = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalT += t + ' ';
+      else interim += t;
+    }
+    if (finalT) transcriptState.committedText += finalT;
+    transcriptState.currentInterim = interim;
+    transcript.innerText = transcriptState.committedText + transcriptState.currentInterim;
+    answers[current] = transcript.innerText.trim();
+    saveToStorage();
+  };
+  recognition.onerror = (e) => {
+    if (status) status.textContent = 'שגיאת תמלול: ' + e.error;
+  };
+  recognition.onend = () => {
+    if (isLiveTranscribing && !isInterviewPaused) {
+      try { recognition.start(); } catch(e){}
+    }
+  };
+  try { recognition.start(); } catch(e){}
+}
+
+function stopLiveTranscription(btn, status) {
+  isLiveTranscribing = false;
+  if (recognition) { try { recognition.stop(); } catch(e){} }
+  if (btn) {
+    btn.classList.remove('recording');
+    btn.textContent = '🎤 המשך תמלול חי';
+  }
+  if (status) {
+    status.className = 'rec-status background';
+    status.textContent = 'ההקלטה הקולית רצה ברקע';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  FINISH & EXPORT
+// ════════════════════════════════════════════════════════════════════
+async function finishInterview() {
+  document.getElementById('floatingIndicator').style.display = 'none';
+
+  if (isLiveTranscribing) stopLiveTranscription(null, null);
+
+  document.getElementById('app').innerHTML = `
+    <div class="card done-screen" style="text-align:center;">
+      <h2>שומר את הראיון...</h2>
+      <p style="color:var(--med);">רק כמה שניות. אל תסגור את הדף.</p>
+    </div>
+  `;
+
+  const audioBlob = await stopAllRecording();
+
+  // נקה רק את ה-localStorage; את IDB נשאיר עד שהמשתמש יוריד וילחץ על "סיימתי"
+  clearStorage();
+
+  stage = 'done';
+  renderDone(audioBlob);
+}
+
+function renderDone(audioBlob) {
+  const answered = Object.values(answers).filter(a => a && a.length > 0).length;
+  const totalSeconds = Math.floor(getElapsedSeconds());
+  const audioSize = audioBlob ? (audioBlob.size / 1024 / 1024).toFixed(1) : null;
+
+  const date = new Date().toISOString().slice(0, 10);
+  const jsonData = {
+    interview: "ניר · סבב 2 · Rolling Pals",
+    date: new Date().toISOString(),
+    duration_seconds: totalSeconds,
+    duration_formatted: formatTime(totalSeconds),
+    questions_total: QUESTIONS.length,
+    questions_answered: answered,
+    responses: QUESTIONS.map((q, i) => ({
+      index: i,
+      block: q.block,
+      stage: q.stage,
+      number: q.num,
+      question: q.text,
+      answer: answers[i] || "",
+      timestamp_seconds: timestamps[i] !== undefined ? timestamps[i] : null
+    }))
+  };
+  const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], {type:'application/json;charset=utf-8'});
+  const jsonUrl = URL.createObjectURL(jsonBlob);
+  const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
+
+  const jsonFilename = `nir_round2_transcript_${date}.json`;
+  const audioFilename = `nir_round2_audio_${date}.webm`;
+
+  const audioSizeMB = audioBlob ? audioBlob.size / 1024 / 1024 : 0;
+  const isLargeFile = audioSizeMB > 25;
+
+  document.getElementById('app').innerHTML = `
+    <div class="card done-screen">
+      <h2>סיימנו! תודה ניר 🙏</h2>
+      <div class="summary">
+        הראיון נמשך <strong>${formatTime(totalSeconds)}</strong> · ${answered} תשובות נרשמו מתוך ${QUESTIONS.length} שאלות
+      </div>
+
+      <div class="download-area">
+        <h3>📦 הקבצים מוכנים להורדה</h3>
+        <div class="file-row">
+          <div class="file-info">
+            <div class="file-name">📄 ${jsonFilename}</div>
+            <div class="file-size">תמלולים מלאים + שאלות · קובץ קטן</div>
+          </div>
+          <a href="${jsonUrl}" download="${jsonFilename}">
+            <button class="btn-success">⬇ הורד</button>
+          </a>
+        </div>
+        ${audioBlob ? `
+        <div class="file-row">
+          <div class="file-info">
+            <div class="file-name">🎙️ ${audioFilename}</div>
+            <div class="file-size">הקלטה מלאה · ${audioSize}MB</div>
+          </div>
+          <a href="${audioUrl}" download="${audioFilename}">
+            <button class="btn-success">⬇ הורד</button>
+          </a>
+        </div>
+        ` : ''}
+        <div class="download-hint">
+          💡 הקבצים יישמרו בתיקיית "הורדות" (Downloads) של המחשב שלך
+        </div>
+      </div>
+
+      <div class="send-instructions">
+        <h3>📤 איך לשלוח אלינו את הקבצים</h3>
+
+        <div class="send-option">
+          <div class="opt-title">1 · WhatsApp <span style="font-weight:normal; color:var(--med); font-size:13px;">— הכי פשוט</span></div>
+          <div class="opt-body">
+            פתח את ה-WhatsApp במחשב או בנייד, צרף את שני הקבצים, ושלח. עובד עד 100MB לקובץ — מספיק לראיון רגיל.
+          </div>
+        </div>
+
+        <div class="send-option">
+          <div class="opt-title">2 · WeTransfer <span style="font-weight:normal; color:var(--med); font-size:13px;">— אם הקבצים גדולים, בלי הרשמה</span></div>
+          <div class="opt-body">
+            היכנס ל-<strong>wetransfer.com</strong>, גרור את הקבצים, רשום את המייל שלנו, לחץ "שלח". עד 2GB בחינם.
+          </div>
+        </div>
+
+        <div class="send-option">
+          <div class="opt-title">3 · Google Drive / Dropbox <span style="font-weight:normal; color:var(--med); font-size:13px;">— אם נוח לך</span></div>
+          <div class="opt-body">
+            העלה לכונן שלך, צור קישור שיתוף, ושלח לנו את הקישור.
+          </div>
+        </div>
+
+        ${isLargeFile ? `
+        <div class="email-warn">
+          ⚠️ <strong>שים לב:</strong> קובץ ההקלטה (${audioSize}MB) גדול מ-25MB — לא יעבור במייל רגיל (Gmail/Outlook).
+          עדיף WhatsApp או WeTransfer.
+        </div>
+        ` : ''}
+      </div>
+
+      <div class="cleanup-row">
+        <button class="btn-cleanup" id="cleanupBtn">✓ הורדתי את הקבצים — נקה זיכרון זמני</button>
+        <p style="font-size:12px; color:var(--med); margin-top:8px;">
+          (הקלטה זמנית של ${audioSize || '?'}MB שמורה במחשב שלך עד שתנקה)
+        </p>
+      </div>
+
+      <p class="thanks">
+        אם משהו לא ברור — תכתוב לנו ונפתור מהר.
+      </p>
+    </div>
+  `;
+
+  document.getElementById('cleanupBtn').onclick = async () => {
+    try {
+      await clearChunks();
+      const btn = document.getElementById('cleanupBtn');
+      btn.classList.add('done');
+      btn.textContent = '✓ הזיכרון נוקה';
+      btn.disabled = true;
+    } catch(e) {
+      console.warn('cleanup failed', e);
+    }
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════
+async function init() {
+  // פותחים IDB מוקדם
+  try { await openDB(); } catch(e) { console.warn('IDB unavailable:', e); }
+
+  const saved = loadFromStorage();
+  const chunksExist = await hasChunks();
+
+  if (saved && saved.answers && Object.keys(saved.answers).length > 0) {
+    const lastSavedDate = new Date(saved.lastSaved).toLocaleString('he-IL');
+    const audioMsg = chunksExist
+      ? '\n\nההקלטה הקולית הקודמת נשמרה ותצורף לסיום הראיון.'
+      : '\n\nההקלטה הקולית הקודמת לא נשמרה — רק התמלול הטקסטואלי משוחזר.';
+
+    if (confirm(`מצאנו ראיון שמור מ-${lastSavedDate}.\n\nרוצה להמשיך מהשאלה שעצרת בה?${audioMsg}`)) {
+      answers = saved.answers || {};
+      timestamps = saved.timestamps || {};
+      current = saved.current || 0;
+      recoveredElapsedSeconds = saved.elapsedSeconds || 0;
+      stage = 'mic_test';
+      renderMicTest();
+      return;
+    } else {
+      clearStorage();
+      try { await clearChunks(); } catch(e){}
+    }
+  } else if (chunksExist) {
+    // מצב לא תקין — chunks בלי תמלול. נקה.
+    try { await clearChunks(); } catch(e){}
+  }
+
+  renderWelcome();
+}
+
+init();
+</script>
+</body>
+</html>
