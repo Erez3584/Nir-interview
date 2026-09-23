@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>כלי תחקור — ניר · סבב 3</title>
+<title>כלי תחקור — ניר · סבב 4</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -161,54 +161,40 @@ button{font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border:
 <script>
 let stage='welcome';
 const QUESTIONS=[
-{block:0,section:"open",stage:"פתיחה",cls:"stage-welcome",num:"0.1 · פתיחה",text:"ניר, תודה שאתה איתנו לסבב שלישי. הפעם החלטנו להתמקד במוצר אחר מהקריירה שלך — הקופסה עם המכסה המחלק שעבדת עליה ב-Plasel. אם בסבב הקודם דיברנו על Roll & Pal שנכשל, הפעם אני רוצה להבין מוצר שהצליח. ובסוף נשאיר פתח להזכיר מוצרים אחרים שמתעוררים לך בראש. קח את הזמן שלך, אין לחץ.",note:"פתיחה — לא חובה לענות. לחץ 'הבא' כשמוכן."},
-{block:1,section:"1a",stage:"בלוק 1 · הקופסה — חימום",cls:"stage-block1",num:"1.0 · חימום",text:"בשאלות הבאות נצלול לרבדים שונים של מוצר המכסה המחלק מתקופתך ב-Plasel. נשמח לפתוח בתיאור קצר של המוצר ושל התקופה שלך שם — מפה נצלול לאספקטים יותר ספציפיים.",note:"תיאור של דקה. אחר כך נכנס לעומק."},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.1",text:"קח אותי לרגע הראשון שבו הקופסה הזו הופיעה אצלך. איפה היית, מי דיבר איתך עליה, ומה היה הצורך הספציפי שצריך היה לפתור?",note:"שאלת פתיחה — קח את הזמן שלך."},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.2",text:"מתי גילית שכבר קיים פטנט על משהו דומה? מה היה הסימן הראשון — מישהו אמר לך, חיפשת בעצמך, או נתקלת במקרה?",note:""},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.3",text:"מה היה הפטנט הקיים? מי החזיק בו, ומה בדיוק הוא הגן עליו?",note:"פרטים קונקרטיים — שם החברה אם זוכר."},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.4",text:"ברגע שהבנת שיש פטנט קיים — מה הייתה התגובה הראשונה שלך? האם חשבת לזנוח את הרעיון, או שמיד התחלת לחשוב איך לעקוף?",note:""},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.5",text:"תוכל לתאר לי את ההחלטה הספציפית איך לעקוף את הפטנט — מה היה השינוי הקריטי שאפשר לכם לפתח משהו דומה אבל אחר?",note:""},
-{block:1,section:"1a",stage:"1א · הולדת הרעיון והפטנט",cls:"stage-block1",num:"1.6",text:"המשפט שלך מסבב 1 — 'לפעמים אין רע בלהעתיק' — מאיפה הוא בא? האם הוא נוצר תוך כדי העבודה על הקופסה הזו, או שהיה לך כבר קודם?",note:""},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.7",text:"אחרי שהיה ברור איך עוקפים את הפטנט — מי היה הלקוח הראשון שהראית לו את הרעיון, ומה היה הדבר הראשון שהוא שאל אותך?",note:""},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.8",text:"מה היה השינוי הטכני המשמעותי ביותר שעשיתם תוך כדי הפיתוח? איטרציה אחת שנזכרת לך טוב — מה היה לפניה ומה אחריה?",note:""},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.9",text:"היה רגע שבו חששת שאתם 'דורכים' על הפטנט מבלי כוונה — שהשינויים שעשיתם לא מספיקים?",note:""},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.10",text:"מה הייתה התקלה הטכנית הכי כואבת בפיתוח הזה? קח אותי לבוקר הספציפי שגיליתם אותה.",note:"בוקר ספציפי, גילוי קונקרטי."},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.11",text:"מי היו השותפים שלך בפיתוח הזה? מי חשב על המנגנון איתך, מי בדק את הפטנט, מי אישר את ההחלטות?",note:""},
-{block:1,section:"1b",stage:"1ב · האפיון והפיתוח",cls:"stage-block2",num:"1.12",text:"האם היה רגע שבו הרגשת 'עכשיו המוצר באמת מוכן'? מה היה הסימן?",note:""},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.13",text:"מתי הבנת שהמוצר תופס בשוק? מה היה הסימן הראשון שמשהו עובד?",note:"רגע קונקרטי של 'אהה, זה הולך'."},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.14",text:"מי היו המכירות הראשונות? לקוח אחד שאתה זוכר שאמר 'אני קונה' — מי זה היה ולמה הוא קנה?",note:""},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.15",text:"מה הפך את הקופסה למוצר שאנשים רצו לקנות — בניגוד למוצרים אחרים שאתה מכיר ופותחו אבל לא תפסו?",note:""},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.16",text:"האם היה משהו שגרם להצלחה שלא ציפיתם לו — מאפיין שלא תכננתם והפך להיות הסיבה שאנשים אהבו את המוצר?",note:""},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.17",text:"מה היה הלקוח האידיאלי של הקופסה? תאר לי אותו — גיל, סוג מטבח, מה הוא חיפש כשבחר אותה.",note:""},
-{block:1,section:"1c",stage:"1ג · המסחור וההצלחה",cls:"stage-block3",num:"1.18",text:"אם היית צריך להגיד מה האחוז של ההצלחה שבא מהמוצר עצמו לעומת המכירות והשיווק — איך היית מחלק?",note:""},
-{block:1,section:"1d",stage:"1ד · השוואה ל-Roll & Pal",cls:"stage-block4",num:"1.19",text:"עכשיו אחרי ששנינו דיברנו על הקופסה, ובסבב הקודם על Roll & Pal — מה אתה רואה כהבדל המרכזי בין שני המסעות?",note:""},
-{block:1,section:"1d",stage:"1ד · השוואה ל-Roll & Pal",cls:"stage-block4",num:"1.20",text:"ויש מוצר אחר מהקריירה שלך שעולה לך לראש כשאתה חושב על ההבדל הזה? משהו שהיה דומה לאחד מהם, או דווקא נקודה שלישית אחרת לגמרי?",note:""},
-{block:1,section:"1d",stage:"1ד · השוואה ל-Roll & Pal",cls:"stage-block4",num:"1.21",text:"ב-Roll & Pal אמרת ש'הצורך היה יותר של אנשי הפיתוח ואנשי הייצור מאשר של המשתמשים'. כשאתה משווה לקופסה — איפה זה דומה ואיפה שונה?",note:""},
-{block:1,section:"1d",stage:"1ד · השוואה ל-Roll & Pal",cls:"stage-block4",num:"1.22",text:"מה היית עושה אחרת אם היית מקבל היום שני פרויקטים חדשים — אחד שדומה ל-Roll & Pal ואחד שדומה לקופסה? איך היית מזהה מראש איזה ילך ואיזה לא?",note:""},
-{block:2,section:"2-1",stage:"בלוק 2 · טבעת 1 · בחירה חופשית",cls:"stage-block1",num:"2.1",text:"עכשיו בלי שאני מכוון אותך — איזה פרויקט אחר מהקריירה שלך עולה לך בראש כשאתה חושב על השיחות שלנו עד עכשיו?",note:"אתה בוחר. הפרויקט שעולה לך בראש עכשיו הוא הנכון."},
-{block:2,section:"2-1",stage:"בלוק 2 · טבעת 1 · בחירה חופשית",cls:"stage-block1",num:"2.2",text:"ספר לי על הפרויקט הזה במשפט-שניים — מה הוא היה, מה היה המיוחד בו?",note:""},
-{block:2,section:"2-1",stage:"בלוק 2 · טבעת 1 · בחירה חופשית",cls:"stage-block1",num:"2.3",text:"אם היית צריך להגיד דבר אחד שעבד שם — או דבר אחד שלא עבד — מה היית מספר?",note:""},
-{block:2,section:"2-2",stage:"בלוק 2 · טבעת 2 · הלמידה החדה",cls:"stage-block2",num:"2.4",text:"איזה פרויקט מהקריירה שלך לימד אותך הכי הרבה דווקא בגלל הקושי שהיה בו?",note:""},
-{block:2,section:"2-2",stage:"בלוק 2 · טבעת 2 · הלמידה החדה",cls:"stage-block2",num:"2.5",text:"מה היה הקושי הספציפי?",note:""},
-{block:2,section:"2-2",stage:"בלוק 2 · טבעת 2 · הלמידה החדה",cls:"stage-block2",num:"2.6",text:"מה למדת ממנו שלקחת איתך הלאה לפרויקטים הבאים?",note:""},
-{block:2,section:"2-3",stage:"בלוק 2 · טבעת 3 · מבט-על",cls:"stage-block3",num:"2.7",text:"אם היית מציג למישהו את החיים המקצועיים שלך דרך 3 מוצרים בלבד — אילו 3 היית בוחר ולמה?",note:""},
-{block:2,section:"2-3",stage:"בלוק 2 · טבעת 3 · מבט-על",cls:"stage-block3",num:"2.8",text:"מה משותף לשלושת המוצרים האלה? מה ההבדל ביניהם?",note:""},
-{block:5,section:"close",stage:"סגירה",cls:"stage-close",num:"ס.1",text:"אם היית צריך לסכם את שני הסבבים האחרונים שלנו במשפט אחד — מה היית אומר על עצמך כמפתח מוצרים?",note:""},
-{block:5,section:"close",stage:"סגירה",cls:"stage-close",num:"ס.2",text:"מה שאלה אחת שלא שאלתי אותך עד עכשיו ושהיית רוצה שאשאל?",note:"המקום שלך להוסיף משהו שלא הספקנו לכסות."}
+{block:0,section:"open",stage:"פתיחה",cls:"stage-welcome",num:"0.1 · פתיחה",text:"ניר, זה הסבב הרביעי — ומבחינתנו הסבב המסכם. עברנו יחד את Roll & Pal ואת ביופק, ואני רוצה לסגור עם הפרק שהכי סקרן אותי ושעדיין לא נגענו בו — עולם הארגזים והלוגיסטיקה ב-Polymer Logistics. אין כאן שאלות 'נכון/לא נכון' — קח את הזמן שלך וספר בזרימה; אם כמה שאלות קרובות מתחברות לך לסיפור אחד, ענה עליהן יחד. אחרי שאעבד את מה שתספר, אולי אחזור אליך לשיחה קצרה על נקודה או שתיים.",note:"פתיחה — לא חובה לענות. לחץ 'הבא' כשמוכן."},
+{block:1,section:"1a",stage:"בלוק 1 · המכרז האיטלקי — חימום",cls:"stage-block1",num:"1.0 · חימום",text:"בשאלות הבאות נצלול לפרויקט הארגזים המתקפלים הגדול מתקופת Polymer Logistics. נתחיל בתיאור קצר — מה היה הפרויקט הזה, ובאיזו תקופה?",note:"תיאור של דקה, אחר כך נעמיק."},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.1",text:"בסבב הקודם הזכרת פרויקט ענק של ארגזים מתקפלים — כ-5 מיליון יחידות בזמן קצר, שהתחיל באיטליה. קח אותי לרגע הראשון: איך הפרויקט הזה הגיע אליכם? מי היה הלקוח, ואיך זכיתם בו?",note:"שם הלקוח — כפי שאתה זוכר אותו."},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.2",text:"הזכרת 'ידית קיפול אוניברסלית, שעובדת גם למעלה וגם למטה'. קח אותי לרגע שהמצאתם אותה — מה הבעיה שהיא באה לפתור?",note:""},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.3",text:"איך נכנסים לשוק שכבר קיים, עם 5 מיליון ארגזים בזמן כה קצר? מה היה הדבר הראשון שהיה חייב לעבוד?",note:""},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.4",text:"להקים מפעל באיטליה ואז להעביר אותו לארצות הברית — ספר לי על ההחלטה הזאת. מה חייב את המעבר?",note:""},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.5",text:"מה היה הסיכון הכי גדול בפרויקט? הרגע שהכי חששת בו? היה שלב שבו זה כמעט השתבש?",note:""},
+{block:1,section:"1a",stage:"1 · המכרז האיטלקי",cls:"stage-block1",num:"1.6",text:"אמרת 'סיכון גדול, אבל מדהים מבחינת התוצאה'. מה עשה את ההצלחה כאן — בניגוד ל-Roll & Pal שקרס?",note:"אם עולה לך השוואה — לך איתה, זה בדיוק מה שמעניין."},
+{block:2,section:"2a",stage:"בלוק 2 · הארגז לצימוקים",cls:"stage-block2",num:"2.1",text:"בסבב הקודם סיפרת על ארגז גדול לצימוקים בקליפורניה. תמשיך מאיפה שעצרת — מה הייתה הבעיה שבאתם לפתור, ומה תכננתם?",note:""},
+{block:2,section:"2a",stage:"בלוק 2 · הארגז לצימוקים",cls:"stage-block2",num:"2.2",text:"תיארת שהצימוקים נדבקו בתוך הארגז ולא השתחררו. איך גיליתם את זה — בתכנון או בשטח?",note:""},
+{block:2,section:"2a",stage:"בלוק 2 · הארגז לצימוקים",cls:"stage-block2",num:"2.3",text:"מה ניסיתם כדי לפתור את זה? קח אותי דרך ניסיון אחד ספציפי.",note:""},
+{block:2,section:"2a",stage:"בלוק 2 · הארגז לצימוקים",cls:"stage-block2",num:"2.4",text:"אמרת שהתוצאה 'לא הייתה מדהימה' ושהמגדלים 'לא התקדמו' אחרי שכבר הושקע בתבניות. ספר לי על הרגע שהבנת שזה לא הולך להימכר — מי אמר לך, ומה הרגשת?",note:"רגע ספציפי, לא הסבר כללי."},
+{block:2,section:"2a",stage:"בלוק 2 · הארגז לצימוקים",cls:"stage-block2",num:"2.5",text:"המוצר עצמו עבד — אז מה עצר? זה היה הלקוח, המחיר, ההרגל? במבט אחורה, היה סימן מוקדם שאפשר היה לראות?",note:""},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.1",text:"המכרז האיטלקי נמכר במיליונים, ו-Roll & Pal קרס מסחרית — שניהם מ-Polymer Logistics, אותו עידן, אותו עולם מוצר. כשאתה מעמיד אותם זה מול זה — מה עשה את ההבדל?",note:"קח את הזמן — זו שאלת הליבה של הסבב."},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.2",text:"ואיפה הארגז לצימוקים נופל על הסקאלה הזאת — קרוב יותר לאיטלקי או ל-Roll & Pal? ולמה?",note:""},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.3",text:"בביופק אמרת שמי שקונה (יצרן הכלים) אינו מי שמשתמש (מפעיל המכונה). בשלושת המוצרים האלה — מי היה הקונה ומי המשתמש בכל אחד? זה השפיע על מי שהצליח?",note:""},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.4",text:"דיברת על שוק שמרן שקשה לו להחליף שלושה דברים: ספק, אריזה, וקווי אריזה. בכל אחד משלושת המוצרים — באיזה מהחסמים נתקלת, ומה בדיוק עצר?",note:""},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.5",text:"הזכרת ש-Roll & Pal נמכר בליסינג — הלקוח נחשף לעלות השימוש, לא למחיר המוצר. גם המכרז האיטלקי היה על בסיס שימוש. איך זה ששילמו על שימוש ולא על מוצר שינה את הדרך שבה תכננתם?",note:""},
+{block:3,section:"3a",stage:"בלוק 3 · ההשוואה",cls:"stage-block3",num:"3.6",text:"אמרת פעם: 'אי אפשר לשפוט החלטה בדיעבד — אם ביום ההחלטה שקלת הכול, זו החלטה טובה גם אם התוצאה כשלה'. קח אותי להחלטה כזאת מאחד משלושת המוצרים — אחת שהייתה נכונה ביום שקיבלת אותה, גם אם בדיעבד יצאה אחרת.",note:""},
+{block:4,section:"4a",stage:"בלוק 4 · סגירת הקריירה",cls:"stage-block4",num:"4.1",text:"לפני שנסיים — רוצה לחזור איתך להתחלה. זיווני, מפעל הסנדלים, 8 שנים, מפועל ייצור עד מנהל תפעול. איזה דבר אחד למדת שם שנשאר איתך לאורך כל הקריירה? היה מקרה ספציפי — תקלה, החלטה — שאתה עדיין זוכר?",note:""},
+{block:4,section:"4a",stage:"בלוק 4 · סגירת הקריירה",cls:"stage-block4",num:"4.2",text:"מכל המוצרים שעברנו יחד — Roll & Pal, ביופק, הארגזים — על איזו החלטה אחת אתה הכי גאה? קח אותי לרגע שקיבלת אותה.",note:""},
+{block:4,section:"4a",stage:"בלוק 4 · סגירת הקריירה",cls:"stage-block4",num:"4.3",text:"אם מהנדס צעיר היה יושב מולך ביום הראשון שלו — איזה סיפור אחד מהקריירה שלך היית מספר לו קודם כול?",note:""},
+{block:5,section:"close",stage:"סגירה",cls:"stage-close",num:"ס.1",text:"עברנו יחד ארבעה סבבים ופרקים שלמים מהקריירה שלך. יש משהו שלא שאלתי ושהיית רוצה שאדע?",note:"המקום שלך להוסיף. אין חובה."}
 ];
 
 const SECTIONS=[
 {id:"open",parent:null,name:"פתיחה",short:"פתיחה"},
-{id:"1a",parent:"block1",name:"1א · הולדת הרעיון",short:"הולדת הרעיון"},
-{id:"1b",parent:"block1",name:"1ב · האפיון והפיתוח",short:"האפיון"},
-{id:"1c",parent:"block1",name:"1ג · המסחור וההצלחה",short:"המסחור"},
-{id:"1d",parent:"block1",name:"1ד · השוואה ל-Roll & Pal",short:"השוואה"},
-{id:"2-1",parent:"block2",name:"טבעת 1 · בחירה חופשית",short:"בחירה חופשית"},
-{id:"2-2",parent:"block2",name:"טבעת 2 · הלמידה החדה",short:"הלמידה"},
-{id:"2-3",parent:"block2",name:"טבעת 3 · מבט-על",short:"מבט-על"},
+{id:"1a",parent:"block1",name:"בלוק 1 · המכרז האיטלקי",short:"המכרז האיטלקי"},
+{id:"2a",parent:"block2",name:"בלוק 2 · הארגז לצימוקים",short:"הצימוקים"},
+{id:"3a",parent:"block3",name:"בלוק 3 · ההשוואה",short:"ההשוואה"},
+{id:"4a",parent:"block4",name:"בלוק 4 · סגירת הקריירה",short:"סגירת קריירה"},
 {id:"close",parent:null,name:"סגירה",short:"סגירה"}
 ];
-const PARENTS=[{id:"block1",name:"בלוק 1 · הקופסה"},{id:"block2",name:"בלוק 2 · מוצרי חיים"}];
+const PARENTS=[{id:"block1",name:"בלוק 1 · המכרז האיטלקי"},{id:"block2",name:"בלוק 2 · הצימוקים"},{id:"block3",name:"בלוק 3 · ההשוואה"},{id:"block4",name:"בלוק 4 · סגירה"}];
 function getSectionRange(sId){const r=[];QUESTIONS.forEach((q,i)=>{if(q.section===sId)r.push(i);});return r;}
 
 let current=0,answers={},timestamps={},recognition=null,isLiveTranscribing=false;
@@ -218,12 +204,12 @@ let isInterviewPaused=false,timerInterval=null,micStream=null;
 let recoveredElapsedSeconds=0,userStoppedTranscription=false;
 const transcriptState={committedText:'',currentInterim:''};
 
-const STORAGE_KEY='nir_round3_interview_data';
+const STORAGE_KEY='nir_round4_interview_data';
 function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({answers,timestamps,current,elapsedSeconds:recordingStartTime?getElapsedSeconds():0,lastSaved:new Date().toISOString()}));}catch(e){console.warn('save failed',e);}}
 function loadFromStorage(){try{const d=localStorage.getItem(STORAGE_KEY);return d?JSON.parse(d):null;}catch(e){return null;}}
 function clearStorage(){try{localStorage.removeItem(STORAGE_KEY);}catch(e){}}
 
-const DB_NAME='nir_round3_interview_db',DB_VERSION=1,CHUNKS_STORE='audio_chunks';
+const DB_NAME='nir_round4_interview_db',DB_VERSION=1,CHUNKS_STORE='audio_chunks';
 let db=null;
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onerror=()=>reject(req.error);req.onsuccess=()=>{db=req.result;resolve(db);};req.onupgradeneeded=(e)=>{const d=e.target.result;if(!d.objectStoreNames.contains(CHUNKS_STORE))d.createObjectStore(CHUNKS_STORE,{autoIncrement:true});};});}
 function saveChunk(blob){return new Promise((resolve,reject)=>{if(!db)return reject(new Error('DB not open'));const tx=db.transaction(CHUNKS_STORE,'readwrite');const req=tx.objectStore(CHUNKS_STORE).add(blob);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
@@ -343,16 +329,16 @@ function setupSidebarToggle(){
 function renderWelcome(){
   hideSidebar();
   document.getElementById('app').innerHTML=`
-    <header><h1>תחקור — סבב 3</h1><p>הקופסה עם המכסה המחלק · מוצרי חיים</p></header>
+    <header><h1>תחקור — סבב 4</h1><p>עולם הארגזים · Polymer Logistics</p></header>
     <div class="card welcome-screen">
       <span class="stage-label stage-welcome">ברוך הבא</span>
-      <h2>סבב שלישי, ניר 🙏</h2>
-      <p>תודה שאתה איתנו לסבב נוסף. הפעם נצלול לעומק במוצר אחר מהקריירה שלך — <strong>הקופסה עם המכסה המחלק</strong> שעבדת עליה ב-Plasel — ובסוף נשאיר פתח להזכיר מוצרים אחרים שמתעוררים לך בראש.</p>
-      <p><strong>מה התעדכן בכלי הפעם:</strong></p>
+      <h2>סבב רביעי — הסבב המסכם, ניר 🙏</h2>
+      <p>תודה שאתה איתנו לסבב הרביעי — ומבחינתנו המסכם. הפעם נסגור עם הפרק שעדיין לא נגענו בו: <strong>עולם הארגזים ב-Polymer Logistics</strong> — המכרז האיטלקי, הארגז לצימוקים, וההשוואה בין המוצרים שעברנו. בסוף נחזור רגע להתחלה, לזיווני.</p>
+      <p><strong>איך זה עובד:</strong></p>
       <ul>
-        <li><strong>תמלול חי שמתחיל אוטומטית</strong> — לא צריך ללחוץ "התחל" בכל שאלה</li>
-        <li><strong>מפת הראיון בצד</strong> — תוכל לראות איפה אתה נמצא במבנה הכללי</li>
-        <li><strong>מסך עריכה בסוף</strong> — תוכל לעבור על כל התשובות ולערוך, בלי לעצור באמצע</li>
+        <li>הכלי מתקדם שאלה-שאלה, מקליט ומתמלל תוך כדי — פשוט דבר בטבעיות</li>
+        <li>מפת הראיון בצד מראה לך איפה אתה נמצא</li>
+        <li>בסוף יש מסך עריכה לעבור על התשובות לפני שליחה</li>
       </ul>
       <p>אם משהו לא ברור או נתקלת בקושי — אני זמין בטלפון לאורך כל הדרך.</p>
       <div class="center"><button class="btn-primary" id="goToMicTest">בדיקת מיקרופון →</button></div>
@@ -423,7 +409,7 @@ function renderMicTest(){
   const isRec=recoveredElapsedSeconds>0;
   const recNote=isRec?`<div class="warn" style="margin-bottom:20px;">ℹ️ ממשיכים מנקודה שעצרת — הקלטה קודמת נשמרה ותצורף לסיום. השעון יתחיל מ-${formatTime(recoveredElapsedSeconds)}.</div>`:'';
   document.getElementById('app').innerHTML=`
-    <header><h1>תחקור — סבב 3</h1><p>בדיקת מיקרופון לפני שמתחילים</p></header>
+    <header><h1>תחקור — סבב 4</h1><p>בדיקת מיקרופון לפני שמתחילים</p></header>
     ${recNote}
     <div class="card mic-test">
       <span class="stage-label stage-welcome">צעד אחרון לפני שמתחילים</span>
@@ -459,7 +445,7 @@ function renderInterview(){
   const saved=answers[current];
   document.getElementById('app').innerHTML=`
     <header>
-      <h1>תחקור — סבב 3</h1>
+      <h1>תחקור — סבב 4</h1>
       <p>${q.stage}</p>
       <div class="progress-bar"><div class="progress-fill" style="width:${(current/(total-1))*100}%"></div></div>
     </header>
@@ -595,7 +581,7 @@ function renderReview(){
   const totalAns=Object.values(answers).filter(a=>a&&a.length>0).length;
   const totalSec=Math.floor(getElapsedSeconds());
   document.getElementById('app').innerHTML=`
-    <header><h1>תחקור — סבב 3</h1><p>בדיקה ועריכה לפני סיום</p></header>
+    <header><h1>תחקור — סבב 4</h1><p>בדיקה ועריכה לפני סיום</p></header>
     <div class="card review-screen">
       <h2>עברת את כל השאלות 🙏</h2>
       <p class="intro">לפני שנוריד את הקבצים — תוכל לעבור על התשובות ולערוך אם משהו לא נקלט מדויק. לחץ על כל חלק כדי לפתוח. כשמוכן — "אשר וסיים".</p>
@@ -643,7 +629,7 @@ function renderDone(audioBlob){
   const audioSize=audioBlob?(audioBlob.size/1024/1024).toFixed(1):null;
   const date=new Date().toISOString().slice(0,10);
   const jsonData={
-    interview:"ניר · סבב 3 · הקופסה עם המכסה המחלק + מוצרי חיים",
+    interview:"ניר · סבב 4 · עולם הארגזים ב-Polymer Logistics",
     date:new Date().toISOString(),
     duration_seconds:totalSec,
     duration_formatted:formatTime(totalSec),
@@ -654,8 +640,8 @@ function renderDone(audioBlob){
   const jsonBlob=new Blob([JSON.stringify(jsonData,null,2)],{type:'application/json;charset=utf-8'});
   const jsonUrl=URL.createObjectURL(jsonBlob);
   const audioUrl=audioBlob?URL.createObjectURL(audioBlob):null;
-  const jsonFn=`nir_round3_transcript_${date}.json`;
-  const audioFn=`nir_round3_audio_${date}.webm`;
+  const jsonFn=`nir_round4_transcript_${date}.json`;
+  const audioFn=`nir_round4_audio_${date}.webm`;
   const audioSizeMB=audioBlob?audioBlob.size/1024/1024:0;
   const isLarge=audioSizeMB>25;
   document.getElementById('app').innerHTML=`
